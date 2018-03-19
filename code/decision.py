@@ -7,7 +7,8 @@ def decision_step(Rover):
 
     # Check if we have vision data to make decisions with
     if Rover.nav_angles is not None:
-        # Check for Rover.mode status
+
+    # Check for Rover.mode status
         if Rover.mode == 'forward': 
             # Enough navigable terrain pixels
             if len(Rover.nav_angles) >= Rover.stop_forward:  
@@ -16,7 +17,7 @@ def decision_step(Rover):
                     # Set throttle value to throttle setting
                     Rover.throttle = Rover.throttle_set
                 else: 
-				    # Else coast
+                    # Else coast
                     Rover.throttle = 0
                 Rover.brake = 0
                 # Set steer average angle (clipped)
@@ -52,8 +53,39 @@ def decision_step(Rover):
                     # Set steer to mean angle
                     Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
                     Rover.mode = 'forward'
-    
-	# Just to make the rover do something even if no modifications have been made to the code
+                    
+################ UNCOMMENT THE FOLLOWING BLOCK TO ENABLE ROCK PICKUP #########  
+
+#        elif Rover.picking_up == 1:
+#            Rover.brake = Rover.brake_set
+#            Rover.throttle = 0
+#            Rover.steer = 0
+#            Rover.mode = 'stop'
+#            print('Rover.picking_up == 1')
+#
+#        elif Rover.near_sample == 1:
+#            Rover.brake = Rover.brake_set
+#            Rover.steer = 0
+#            Rover.mode = 'stop'
+#            # 
+#            Rover.send_pickup = True
+#            Rover.samples_located += 1
+#            print('Rover.near_sample == 1')
+#
+#        elif Rover.mode == 'rock_visible':
+#            Rover.brake = 0
+#            # set max throttle
+#            if Rover.vel < Rover.max_vel:
+#                Rover.throttle = Rover.throttle_set
+#            # coast 
+#            else:
+#                Rover.throttle = 0
+#            Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+#            print(Rover.mode == 'rock_visible')
+            
+#################################################
+
+    # Just to make the rover do something even if no modifications have been made to the code
     else:
         Rover.throttle = Rover.throttle_set
         Rover.steer = 0

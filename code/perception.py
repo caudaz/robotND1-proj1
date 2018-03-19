@@ -17,7 +17,7 @@ def color_thresh(img, rgb_thresh=(160, 160, 160)):
     # Return the binary image
     return color_select
 
-# added function - search for RGB values in image below threshold	
+# added function - search for RGB values in image below threshold   
 def color_thresh_below(img, rgb_thresh=(140, 140, 140)):
     # Create an array of zeros same xy size as img, but single channel
     color_select = np.zeros_like(img[:,:,0])
@@ -29,14 +29,14 @@ def color_thresh_below(img, rgb_thresh=(140, 140, 140)):
     color_select[below_thresh] = 1
     # Return the binary image
     return color_select
-	
-# added function - search for RGB values in range using HSV color space	
+    
+# added function - search for RGB values in range using HSV color space 
 def color_thresh_hsv_range(img, lo_thresh=(20,150,100),
                                 hi_thresh=(50,255,255)):
     hsv_image = cv2.cvtColor(img, cv2.COLOR_RGB2HSV, 3)
     range_mask = cv2.inRange(hsv_image, lo_thresh, hi_thresh)
-    return range_mask	
-	
+    return range_mask   
+    
 # Define a function to convert from image coords to rover coords
 def rover_coords(binary_img):
     # Identify nonzero pixels
@@ -158,12 +158,27 @@ def perception_step(Rover):
         Rover.worldmap[rocks_y_world, rocks_x_world, 1] += 255
         Rover.worldmap[navigable_terrain_y_world, navigable_terrain_x_world, 2] += 1
         
-    # 8) Convert rover-centric pixel positions to polar coordinates
-    # Update Rover pixel distances and angles
-        # Rover.nav_dists = rover_centric_pixel_distances
-        # Rover.nav_angles = rover_centric_angles
-    dist, angles = to_polar_coords(navigable_terrain_xpix, navigable_terrain_ypix)
-    Rover.nav_dists = dist
-    Rover.nav_angles = angles
+#################################
+    rocks_dist, rocks_angles = to_polar_coords(rocks_xpix, rocks_ypix)
+
+    # Rock perception
+    if len(rocks_dist) > 0:
+        Rover.mode = 'rock_visible'
+        Rover.nav_dists = rocks_dist
+        Rover.nav_angles = rocks_angles
+        print('Rock_visible. rocks_dist=', len(rocks_dist))
+    else:
+        if Rover.mode == 'rock_visible':
+            Rover.mode = 'forward'
+        # 8) Convert rover-centric pixel positions to polar coordinates
+        # Update Rover pixel distances and angles
+            # Rover.nav_dists = rover_centric_pixel_distances
+            # Rover.nav_angles = rover_centric_angles
+        dist, angles = to_polar_coords(navigable_terrain_xpix, navigable_terrain_ypix)
+        Rover.nav_dists = dist
+        Rover.nav_angles = angles
+
+#################################
+    
 
     return Rover
